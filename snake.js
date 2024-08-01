@@ -16,21 +16,50 @@ let velocityY = 0;
 
 const snakeBody = [];
 
-// main function on page loading
-window.onload = function () {
-	const board = document.getElementById('canvas'); // canvas element
+// Audio files
+const backgroundMusic = new Audio('./audio/sounds_effects_background.mp3');
+const eatSound = new Audio('./audio/sounds_effects_snake_eat.wav');
+const looseSound = new Audio('./audio/sounds_effects_snake_looses.wav');
 
-	// canvas borders
+// Loop background music
+backgroundMusic.loop = true;
+
+// Variable to track if music has started
+let musicStarted = false;
+
+// Main function on page loading
+window.onload = function () {
+	const board = document.getElementById('canvas'); // Canvas element
+
+	// Canvas borders
 	board.height = rows * blockSize;
 	board.width = columns * blockSize;
 	const context = board.getContext('2d');
 
-	foodPlace(); // food update
+	foodPlace(); // Food update
 
-	document.addEventListener('keyup', changeDirection); // on key click
+	// Listen for any interaction to start the music
+	document.addEventListener('keydown', startBackgroundMusic);
+	document.addEventListener('click', startBackgroundMusic);
 
-	setInterval(() => snakeUpdate(context, board), 100); // update snake position every 100 ms
+	document.addEventListener('keyup', changeDirection); // On key click
+
+	setInterval(() => snakeUpdate(context, board), 100); // Update snake position every 100 ms
 };
+
+// Function to start the background music
+function startBackgroundMusic() {
+	if (!musicStarted) {
+		backgroundMusic.play().catch(error => {
+			console.log('Background music play failed:', error);
+		});
+		musicStarted = true;
+
+		// Remove event listeners after music starts
+		document.removeEventListener('keydown', startBackgroundMusic);
+		document.removeEventListener('click', startBackgroundMusic);
+	}
+}
 
 // function for snake position update
 const snakeUpdate = (context, board) => {
@@ -52,6 +81,7 @@ const snakeUpdate = (context, board) => {
 
 	// Add snake size if get food
 	if (snakeX === foodX && snakeY === foodY) {
+		eatSound.play();
 		snakeBody.push([foodX, foodY]);
 		foodPlace();
 	}
@@ -67,8 +97,22 @@ const snakeUpdate = (context, board) => {
 	}
 
 	// board
-	context.fillStyle = 'black';
-	context.fillRect(0, 0, board.width, board.height);
+	function drawBoard() {
+		context.fillStyle = 'black'; // background color of the board
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
+		context.strokeStyle = 'white'; // color of the grid lines
+		context.lineWidth = 1;
+
+		for (let row = 0; row < rows; row++) {
+			for (let col = 0; col < columns; col++) {
+				// Draw each cell with a rectangle
+				context.strokeRect(col * blockSize, row * blockSize, blockSize, blockSize);
+			}
+		}
+	}
+
+	drawBoard();
 
 	context.fillStyle = 'red';
 	context.fillRect(foodX, foodY, blockSize, blockSize);
@@ -122,6 +166,7 @@ const changeDirection = e => {
 
 // Game reset
 const resetGame = () => {
+	looseSound.play();
 	alert(`Game over!\nScore = ${snakeBody.length}`);
 	snakeX = blockSize * 5;
 	snakeY = blockSize * 5;
