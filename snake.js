@@ -19,7 +19,6 @@ const snakeBody = [];
 // Audio files
 const backgroundMusic = new Audio('./audio/sounds_effects_background.mp3');
 const eatSound = new Audio('./audio/sounds_effects_snake_eat.wav');
-const looseSound = new Audio('./audio/sounds_effects_snake_looses.wav');
 
 // Loop background music
 backgroundMusic.loop = true;
@@ -30,6 +29,9 @@ let musicStarted = false;
 // Main function on page loading
 window.onload = function () {
 	const board = document.getElementById('canvas'); // Canvas element
+	const speedInput = document.getElementById('speed'); // Speed input
+	let snakeSpeed = speedInput.value; // Initial speed
+	let gameInterval; // for speed update
 
 	// Canvas borders
 	board.height = rows * blockSize;
@@ -44,22 +46,39 @@ window.onload = function () {
 
 	document.addEventListener('keyup', changeDirection); // On key click
 
-	setInterval(() => snakeUpdate(context, board), 100); // Update snake position every 100 ms
+	function updateSnakeSpeed() {
+		clearInterval(gameInterval);
+		snakeSpeed = speedInput.value;
+
+		gameInterval = setInterval(() => snakeUpdate(context, board), 100 - snakeSpeed);
+		console.log(snakeSpeed);
+	}
+
+	speedInput.addEventListener('input', updateSnakeSpeed);
+
+	gameInterval = setInterval(() => snakeUpdate(context, board), 100 - snakeSpeed);
 };
 
 // Function to start the background music
-function startBackgroundMusic() {
+const startBackgroundMusic = () => {
 	if (!musicStarted) {
-		backgroundMusic.play().catch(error => {
-			console.log('Background music play failed:', error);
-		});
+		backgroundMusic.play();
+		backgroundMusic.volume = 0.1;
 		musicStarted = true;
 
-		// Remove event listeners after music starts
+		// Remove events after music starts
 		document.removeEventListener('keydown', startBackgroundMusic);
 		document.removeEventListener('click', startBackgroundMusic);
 	}
 }
+
+const endBackgroundMusic = () => {
+	if (musicStarted) {
+		backgroundMusic.pause();
+		backgroundMusic.currentTime = 0;
+		musicStarted = false;
+	}
+};
 
 // function for snake position update
 const snakeUpdate = (context, board) => {
@@ -82,6 +101,7 @@ const snakeUpdate = (context, board) => {
 	// Add snake size if get food
 	if (snakeX === foodX && snakeY === foodY) {
 		eatSound.play();
+		eatSound.volume = 0.1;
 		snakeBody.push([foodX, foodY]);
 		foodPlace();
 	}
@@ -166,7 +186,6 @@ const changeDirection = e => {
 
 // Game reset
 const resetGame = () => {
-	looseSound.play();
 	alert(`Game over!\nScore = ${snakeBody.length}`);
 	snakeX = blockSize * 5;
 	snakeY = blockSize * 5;

@@ -7,13 +7,63 @@
 </head>
 <style>
   body {
-    text-align: center;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  .Game__container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+  }
+
+  .Game--controller {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .Game--controller .middle {
+    display: flex;
+  }
+
+  button {
+    padding: 4px 8px;
+    font-size: 25px;
   }
 </style>
 <body>
-  <h1>Welcome, to the Snake game!</h1>
-  <canvas id='canvas'></canvas>
-
+  <h1>Snake game</h1>
+  <div class="Game__container">
+    <canvas id='canvas'></canvas>
+    <div class="Game--controller">
+      <button onclick='changeDirection({code: "ArrowUp"})' type='button'>Top</button>
+      <div class="middle">
+        <button onclick='changeDirection({code: "ArrowLeft"})' type="button">Left</button>
+        <button onclick='changeDirection({code: "ArrowRight"})' type="button">Right</button>
+      </div>
+      <button onclick='changeDirection({code: "ArrowDown"})' type="button">Bottom</button>
+    </div>
+    <div class="Game--settings">
+      <label for="speed">Snake speed:</label>
+      <input type="range" id="speed" name="speed" min="1" max="50" value='25'>
+      <button onclick='endBackgroundMusic()' type="button" id="bcgMusicOff" name="bcgMusic">Off music</button>
+      <button onclick='startBackgroundMusic()' type="button" id="bcgMusicStart" name="bcgMusic">On music</button>
+    </div>
+  </div>
   <script src="./snake.js"></script>
 </body>
 </html>
