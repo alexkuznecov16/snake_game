@@ -1,3 +1,4 @@
+// board
 const blockSize = 25;
 const rows = 15;
 const columns = 15;
@@ -23,7 +24,7 @@ const eatSound = new Audio('./audio/sounds_effects_snake_eat.wav');
 // Loop background music
 backgroundMusic.loop = true;
 
-// Variable to track if music has started
+// if music has started
 let musicStarted = false;
 
 // Main function on page loading
@@ -69,16 +70,12 @@ const startBackgroundMusic = () => {
 		// Remove events after music starts
 		document.removeEventListener('keydown', startBackgroundMusic);
 		document.removeEventListener('click', startBackgroundMusic);
-	}
-}
-
-const endBackgroundMusic = () => {
-	if (musicStarted) {
+	} else {
 		backgroundMusic.pause();
 		backgroundMusic.currentTime = 0;
 		musicStarted = false;
 	}
-};
+}
 
 // function for snake position update
 const snakeUpdate = (context, board) => {
